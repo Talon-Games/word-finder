@@ -76,7 +76,7 @@ impl NumberInput {
                     kind: KeyEventKind::Press,
                     ..
                 }) => match code {
-                    KeyCode::Char('q') => {
+                    KeyCode::Esc => {
                         terminal::disable_raw_mode().unwrap();
                         std::process::exit(0);
                     }

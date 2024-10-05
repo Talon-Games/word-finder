@@ -9,7 +9,7 @@ use std::io;
 fn main() {
     println!("Welcome to word finder!");
     println!("Find the perfect word for you.");
-    println!("Press q at any time to exit the program.");
+    println!("Press \"esc\" at any time to exit the program.");
     loop {
         search()
     }
