@@ -45,18 +45,25 @@ fn search() {
     println!("--------------------------------------");
 }
 
-fn find_words_from_list(word_length: i32, letter_requirements: Vec<String>) -> Vec<&'static str> {
+fn find_words_from_list(word_length: i32, letter_requirements: Vec<String>) -> Vec<String> {
     let words_file: Vec<&str> = include_str!("./words.txt")
         .lines()
         .map(|line| line.trim())
-        .filter(|line| !line.is_empty() && line.len() == word_length as usize)
+        .filter(|line| {
+            !line.is_empty()
+                && line.split("::").collect::<Vec<&str>>()[0].trim().len() == word_length as usize
+        })
         .collect();
 
     let mut fitting_words = Vec::new();
 
-    for word in words_file {
+    for line in words_file {
         let mut valid = true;
+        let line: Vec<&str> = line.split("::").collect();
+        let word = line[0].trim();
+        let mut definition = line[1].trim();
         for (i, letter) in word
+            .trim()
             .split("")
             .into_iter()
             .filter(|s| !s.is_empty())
@@ -73,7 +80,11 @@ fn find_words_from_list(word_length: i32, letter_requirements: Vec<String>) -> V
             continue;
         }
 
-        fitting_words.push(&*word)
+        if definition.len() == 0 {
+            definition = "[no definition]"
+        }
+
+        fitting_words.push(format!("{} - {}", word, definition))
     }
 
     fitting_words
