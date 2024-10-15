@@ -62,7 +62,13 @@ fn find_words_from_list(
     letter_requirements: Vec<String>,
     search_english_list: bool,
 ) -> Vec<String> {
-    let words_file: Vec<&str> = include_str!("./words.txt")
+    let file = if search_english_list == true {
+        include_str!("./words.txt")
+    } else {
+        include_str!("./latin_words.txt")
+    };
+
+    let words_file: Vec<&str> = file
         .lines()
         .map(|line| line.trim())
         .filter(|line| {
