@@ -4,18 +4,30 @@ pub mod number_input;
 use crossterm::{cursor, terminal, ExecutableCommand};
 use letter_input::LetterInput;
 use number_input::NumberInput;
-use std::io;
+use std::{env, io};
 
 fn main() {
+    let args: Vec<String> = env::args().collect();
+
+    let mut search_english_list = true;
+
+    if args[1] == "latin" {
+        search_english_list = false;
+    }
+
     println!("Welcome to word finder!");
-    println!("Find the perfect word for you.");
+    if search_english_list {
+        println!("Find the perfect word for you.");
+    } else {
+        println!("Find the perfect Latin word for you.");
+    }
     println!("Press \"esc\" at any time to exit the program.");
     loop {
-        search()
+        search(search_english_list)
     }
 }
 
-fn search() {
+fn search(search_english_list: bool) {
     let word_length = NumberInput::new()
         .message("Word length: ")
         .min(1)
@@ -33,7 +45,7 @@ fn search() {
         letter_requirements.push(letter);
     }
 
-    let words = find_words_from_list(word_length, letter_requirements);
+    let words = find_words_from_list(word_length, letter_requirements, search_english_list);
     println!("--------------------------------------");
     if words.is_empty() {
         println!("No Words Found")
@@ -45,7 +57,11 @@ fn search() {
     println!("--------------------------------------");
 }
 
-fn find_words_from_list(word_length: i32, letter_requirements: Vec<String>) -> Vec<String> {
+fn find_words_from_list(
+    word_length: i32,
+    letter_requirements: Vec<String>,
+    search_english_list: bool,
+) -> Vec<String> {
     let words_file: Vec<&str> = include_str!("./words.txt")
         .lines()
         .map(|line| line.trim())
