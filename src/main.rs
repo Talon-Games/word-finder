@@ -11,7 +11,7 @@ fn main() {
 
     let mut search_english_list = true;
 
-    if args[1] == "latin" {
+    if args.len() > 1 && args[1] == "latin" {
         search_english_list = false;
     }
 
