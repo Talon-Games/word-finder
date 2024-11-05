@@ -57,7 +57,7 @@ impl LetterInput {
                         std::process::exit(0);
                     }
                     KeyCode::Char(c) => {
-                        if c.is_alphabetic() {
+                        if c.is_alphabetic() || c == '-' || c == '*' {
                             current_char = c.to_string().to_lowercase();
                         }
                     }

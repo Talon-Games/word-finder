@@ -6,6 +6,8 @@ use letter_input::LetterInput;
 use number_input::NumberInput;
 use std::{env, io};
 
+const VOWELS: [&str; 5] = ["a", "e", "i", "o", "u"];
+
 fn main() {
     let args: Vec<String> = env::args().collect();
 
@@ -21,6 +23,7 @@ fn main() {
     } else {
         println!("Find the perfect Latin word for you.");
     }
+    println!("Use * for any vowels or - for any consonant");
     println!("Press \"esc\" at any time to exit the program.");
     loop {
         search(search_english_list)
@@ -94,8 +97,15 @@ fn find_words_from_list(
             if letter_requirements[i] == "" {
                 continue;
             }
+            if letter_requirements[i] == "*" && VOWELS.contains(&letter) {
+                continue;
+            }
+            if letter_requirements[i] == "-" && !VOWELS.contains(&letter) {
+                continue;
+            }
             if letter_requirements[i] != letter {
                 valid = false;
+                break;
             }
         }
         if !valid {
