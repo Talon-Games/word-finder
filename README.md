@@ -34,14 +34,27 @@ Pre-built binaries are available for Windows, macOS, and Linux on the [releases 
 After building or downloading the tool, you can start using Word Finder by running the following command in your terminal:
 
 ```sh
-./word-finder [language]
+word-finder [word list]
 ```
 
 - If you don't provide any arguments, the tool will default to searching for English words.
 - To search for Latin words, run the tool with the argument `latin`:
 
 ```sh
-./word-finder latin
+word-finder latin
+```
+
+- To use a custom word list enter a relative path to a text file
+
+```sh
+word-finder ./custom-words.txt
+```
+
+custom-words.txt
+
+```txt
+word ::
+word :: with definition
 ```
 
 ### Interactive Search
@@ -50,7 +63,9 @@ Once the tool is running, you'll be prompted to:
 
 1. **Enter the word length**: Specify the number of letters in the word you're looking for (between 1 and 50).
 2. **Define letter positions**: For each position in the word, you can either:
-   - Enter a letter to require at that specific location, or
+   - Enter a letter to require at that specific location
+   - Enter a '-' to require a consonant at that specific location
+   - Enter a '\*' to require a vowel at that specific location
    - Leave it blank by pressing Enter if you don't want to restrict that position to a specific letter.
 
 ### Example

@@ -4,21 +4,42 @@ pub mod number_input;
 use crossterm::{cursor, terminal, ExecutableCommand};
 use letter_input::LetterInput;
 use number_input::NumberInput;
+use std::fs::read_to_string;
+use std::path::Path;
 use std::{env, io};
 
 const VOWELS: [&str; 5] = ["a", "e", "i", "o", "u"];
 
+#[derive(PartialEq)]
+enum WordList {
+    English,
+    Latin,
+    Custom,
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    let mut search_english_list = true;
+    let mut word_list = WordList::English;
 
-    if args.len() > 1 && args[1] == "latin" {
-        search_english_list = false;
+    if args.len() > 1 {
+        if args[1] == "latin" {
+            word_list = WordList::Latin;
+        } else {
+            word_list = WordList::Custom;
+        }
     }
 
+    let file = if word_list == WordList::English {
+        include_str!("./words.txt")
+    } else if word_list == WordList::Latin {
+        include_str!("./latin_words.txt")
+    } else {
+        &validate_custom_word_list(&args[1])
+    };
+
     println!("Welcome to word finder!");
-    if search_english_list {
+    if word_list == WordList::English || word_list == WordList::Custom {
         println!("Find the perfect word for you.");
     } else {
         println!("Find the perfect Latin word for you.");
@@ -26,11 +47,66 @@ fn main() {
     println!("Use * for any vowels or - for any consonant");
     println!("Press \"esc\" at any time to exit the program.");
     loop {
-        search(search_english_list)
+        search(file)
     }
 }
 
-fn search(search_english_list: bool) {
+fn validate_custom_word_list(users_path: &str) -> String {
+    let path = Path::new(users_path);
+    if !path.exists() {
+        eprint!(
+            "Failed to load custom word list, no file found at: {}",
+            users_path
+        );
+        std::process::exit(1);
+    }
+    if path.is_dir() {
+        eprintln!("Failed to load custom word list, path must lead to a file");
+        std::process::exit(1);
+    }
+
+    let file = match read_to_string(path) {
+        Ok(file) => file,
+        Err(err) => {
+            eprintln!("Failed to read custom word list: {}", err.to_string());
+            std::process::exit(1);
+        }
+    };
+
+    let mut line = 1;
+    for content in file.lines() {
+        if content.is_empty() {
+            eprintln!(
+                "Failed to read custom word list, no empty lines are allowed: line {}",
+                line
+            );
+            std::process::exit(1);
+        }
+
+        if content.starts_with(" ") {
+            eprintln!(
+                "Failed to read custom word list, no spaces allowed at the start of a line: line {}",
+                line
+            );
+            std::process::exit(1);
+        }
+
+        if !content.contains("::") {
+            eprintln!(
+                "Failed to read custom word list, all lines must have a definition seperator: line {}",
+                line
+            );
+            std::process::exit(1);
+        }
+        line += 1;
+    }
+
+    println!("Loaded {} words from custom file", line - 1);
+
+    return file;
+}
+
+fn search(file: &str) {
     let word_length = NumberInput::new()
         .message("Word length: ")
         .min(1)
@@ -48,7 +124,7 @@ fn search(search_english_list: bool) {
         letter_requirements.push(letter);
     }
 
-    let words = find_words_from_list(word_length, letter_requirements, search_english_list);
+    let words = find_words_from_list(word_length, letter_requirements, file);
     println!("--------------------------------------");
     if words.is_empty() {
         println!("No Words Found")
@@ -63,14 +139,8 @@ fn search(search_english_list: bool) {
 fn find_words_from_list(
     word_length: i32,
     letter_requirements: Vec<String>,
-    search_english_list: bool,
+    file: &str,
 ) -> Vec<String> {
-    let file = if search_english_list == true {
-        include_str!("./words.txt")
-    } else {
-        include_str!("./latin_words.txt")
-    };
-
     let words_file: Vec<&str> = file
         .lines()
         .map(|line| line.trim())
