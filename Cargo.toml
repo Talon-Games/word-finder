@@ -6,8 +6,8 @@ authors = ["cqb13 <cqb13.dev@gmail.com>"]
 license = "MIT"
 description = "A CLI tool that finds words of a specific length with letters in a specific location."
 readme = "README.md"
-homepage = "https://github.com/cqb13/word-finder"
-repository = "https://github.com/cqb13/word-finder"
+homepage = "https://github.com/Talon-Games/word-finder"
+repository = "https://github.com/Talon-Games/word-finder"
 keywords = ["cli", "tools", "utilities"]
 categories = ["command-line-utilities"]
 
